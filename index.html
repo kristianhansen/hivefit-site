@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HiveFit: find a hive kit that fits you</title>
+<style>
+:root{--ink:#23201A;--honey:#F2B21B;--deep:#8A5A00;--paper:#FBF7EE;--card:#fff;--line:#E6DCC6;--sage:#4F6F52}
+*{box-sizing:border-box}body{margin:0;font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;background:var(--paper);color:var(--ink)}
+header{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding:14px 5vw;border-bottom:1px solid var(--line);background:var(--card)}
+header svg{height:40px;width:auto}nav{display:flex;flex-wrap:wrap;gap:6px 18px}nav a{color:var(--ink);text-decoration:none;font-weight:600;cursor:pointer}
+main{max-width:1040px;margin:0 auto;padding:28px 20px}section{display:none}section.on{display:block}
+h1,h2,h3{font-family:Georgia,serif;line-height:1.2}h1{font-size:clamp(30px,5vw,50px);margin:0 0 14px}
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:32px;align-items:center}@media(max-width:720px){.hero{grid-template-columns:1fr}}
+.btn{display:inline-block;border:0;border-radius:8px;padding:13px 22px;font:600 16px system-ui;background:var(--honey);color:var(--ink);cursor:pointer;margin:6px 8px 0 0}
+.btn.alt{background:transparent;border:2px solid var(--ink)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:30px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}
+form .card{margin-bottom:14px}label{display:block;font-weight:600;margin-bottom:6px}
+select,input[type=text],input[type=email],textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff}
+.checks label{display:inline-block;font-weight:400;margin:0 16px 8px 0}
+.tag{display:inline-block;font-size:13px;border-radius:20px;padding:2px 10px;margin:0 6px 6px 0;background:#F3EAD3}
+.tag.good{background:#E1ECDD;color:#2F4A32}.tag.warn{background:#FCE3C4;color:#6B3D00}
+.result{display:grid;grid-template-columns:90px 1fr auto;gap:18px;margin-bottom:14px}@media(max-width:680px){.result{grid-template-columns:1fr}}
+.price{text-align:right;font:700 26px Georgia,serif}.price small{display:block;font:400 13px system-ui}
+.note{font-size:14px;color:#655D4C}a{color:var(--deep)}footer{border-top:1px solid var(--line);padding:22px 5vw;font-size:14px;color:#655D4C}
+
+dialog{width:min(560px,94vw);max-height:92vh;max-height:92dvh;border:0;border-radius:16px;padding:0;overflow:hidden;background:var(--paper);color:var(--ink)}
+dialog[open]{display:flex;flex-direction:column}html:has(dialog[open]){overflow:hidden}
+.wh{flex:none;padding:22px 22px 0}.wh h2{margin:10px 0}.wh h2:focus{outline:none}.wb{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:4px 22px 14px}.wf{flex:none;padding:0 22px 14px;border-top:1px solid var(--line)}
+.zr{flex-wrap:nowrap}.zr input[type=text]{flex:1;min-width:0;max-width:200px;min-height:50px;font-size:20px}.zr .btn{margin:0;white-space:nowrap}dialog::backdrop{background:rgba(35,32,26,.65)}
+.bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--honey)}
+.opts{display:grid;gap:8px;margin:10px 0}.opt{border:2px solid var(--line);background:#fff;border-radius:10px;padding:12px 14px;text-align:left;font:inherit;color:var(--ink);cursor:pointer}
+.opt[aria-pressed=true]{border-color:var(--deep);background:#FCEBB8;font-weight:600}.row{display:flex;flex-wrap:wrap;gap:8px}.nav{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-top:14px}
+.link{background:none;border:0;color:var(--deep);text-decoration:underline;cursor:pointer;font:inherit;padding:8px}
+.res{margin-bottom:14px;display:grid;grid-template-columns:96px 1fr auto;gap:18px}.res.top{border:3px solid var(--honey);box-shadow:0 8px 28px rgba(138,90,0,.15)}@media(max-width:680px){.res{grid-template-columns:1fr}.price{text-align:left}}
+.ring{width:92px;height:92px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--c) calc(var(--v)*1%),#EEE6D3 0)}.ring b{width:70px;height:70px;border-radius:50%;background:#fff;display:grid;place-items:center;font:700 26px Georgia,serif}
+.crit{display:grid;grid-template-columns:90px 120px 1fr;gap:10px;align-items:center;font-size:14px}.crit .bar{height:8px}.unk{background:repeating-linear-gradient(45deg,#ddd 0 4px,#fff 4px 8px)}@media(max-width:480px){.crit{grid-template-columns:70px 70px 1fr}}
+.tbl{overflow-x:auto}table{border-collapse:collapse;width:100%;background:#fff;font-size:14px}td,th{border:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+.i{width:24px;height:24px;border-radius:50%;border:2px solid var(--deep);background:#fff;color:var(--deep);font:700 italic 14px Georgia,serif;cursor:pointer;margin-left:6px;vertical-align:middle}
+.tip{display:none;background:#fff;border:1px solid var(--deep);border-radius:8px;padding:10px 12px;font-size:14px;margin:6px 0}.i:hover+.tip,.i:focus-visible+.tip,.i[aria-expanded=true]+.tip,.tip:hover{display:block}
+@media(pointer:coarse){.i{width:32px;height:32px}}
+@media(max-width:600px),(max-height:500px){
+dialog{width:100%;max-width:100%;height:100vh;height:100dvh;max-height:none;margin:0;border-radius:0}
+.wh{padding:max(12px,env(safe-area-inset-top)) 16px 0}.wh h2{font-size:21px;margin:4px 0 8px}.wb{padding:4px 16px 14px}.zr input[type=text]{max-width:none}
+.wb .row:not(.zr){display:grid;grid-template-columns:repeat(auto-fit,minmax(84px,1fr))}.wb .row .opt{padding:10px 6px;text-align:center}
+.wf{display:grid;grid-template-columns:auto auto auto;justify-content:space-between;align-items:center;padding:10px 16px max(6px,env(safe-area-inset-bottom))}.wf .nav,.wf .nav span,.wf>div:last-child{display:contents}
+.wf #next{grid-column:1/-1;grid-row:1;margin:0}.wf .link{grid-row:2;padding:10px 2px;font-size:15px}}
+@media(max-height:500px){.wh .note{display:none}.wh h2{font-size:18px}.wf{display:flex;justify-content:space-between;padding-top:6px}.wf #next{order:1;padding:9px 18px}.wf .link{padding:8px 2px}}
+</style></head><body>
+<header><a href="#" data-go="home" aria-label="HiveFit home"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 80" role="img" aria-label="HiveFit">
+<path d="M40 4 71 22v36L40 76 9 58V22z" fill="#F2B21B"/>
+<g fill="#23201A"><path d="M20 28l20-9 20 9z"/><rect x="23" y="31" width="34" height="9" rx="1.5"/><rect x="23" y="43" width="34" height="9" rx="1.5"/><rect x="23" y="55" width="34" height="7" rx="1.5"/></g>
+<rect x="33" y="57" width="14" height="3" fill="#F2B21B"/>
+<text x="88" y="54" font-family="Georgia, 'Times New Roman', serif" font-size="44" font-weight="700" fill="#23201A">Hive<tspan fill="#B77900">Fit</tspan></text>
+</svg>
+</a><nav><a data-go="home">Home</a><a data-quiz>Find my hive</a><a data-go="survey">Help improve results</a></nav></header>
+<main>
+<section id="home" class="on">
+<div class="hero"><div><h1>Which hive kit fits your yard, your gear and your budget?</h1>
+<p>Answer a few questions and compare US Langstroth-style kits. Every result links to its source, and we say when we don't know something.</p>
+<button class="btn" data-quiz>Find my hive</button><button class="btn alt" data-go="survey">Take the beekeeper survey</button></div>
+<svg viewBox="0 0 300 260" aria-label="Illustration of a stacked hive">
+<circle cx="150" cy="130" r="125" fill="#FCEBB8"/><path d="M62 72 150 44l88 28z" fill="#23201A"/>
+<g fill="#fff" stroke="#23201A" stroke-width="4"><rect x="74" y="72" width="152" height="44"/><rect x="74" y="116" width="152" height="44"/><rect x="74" y="160" width="152" height="52"/></g>
+<g fill="#23201A"><rect x="132" y="88" width="36" height="7" rx="3"/><rect x="132" y="132" width="36" height="7" rx="3"/><rect x="108" y="198" width="84" height="8"/><rect x="82" y="212" width="12" height="22"/><rect x="206" y="212" width="12" height="22"/></g>
+<g fill="#F2B21B" stroke="#23201A" stroke-width="2"><ellipse cx="52" cy="118" rx="11" ry="8"/><ellipse cx="253" cy="152" rx="11" ry="8"/><ellipse cx="236" cy="40" rx="9" ry="7"/></g></svg></div>
+<div class="cards">
+<div class="card"><h3>Matches your gear</h3><p>We start with what you already run, so new boxes and frames work with it.</p></div>
+<div class="card"><h3>Climate counts when it should</h3><p>Insulation gets more weight in cold or hot areas. We don't rank sellers' R-values against each other.</p></div>
+<div class="card"><h3>No paid placement</h3><p>No sponsors or affiliate links. The author runs HiveIQ hives.</p></div></div>
+</section>
+
+<section id="results"><h2 id="rh">Your matches</h2><p id="summary"></p><div id="chips" class="row"></div><div id="compare"></div><div id="list"></div>
+<button class="btn alt" id="more">Show more</button>
+<details class="card" id="key"><summary><b>Key terms</b></summary><div id="keyc"></div>
+<p><b>R-value:</b> how strongly a material resists heat flow; higher resists more. Sellers may measure it differently, so we don't compare or score their figures.<br>
+<b>Fit labels:</b> Great fit is 75+ with most of the needed data known; Good fit 60+; Possible 45 to 59; Weak fit below 45.<br>
+<b>Data on file:</b> how complete our information on a kit is (Most, Some or Little). It is not a quality rating.</p></details>
+<details class="card"><summary><b>How the fit score works</b></summary><p>Each kit is scored 0 to 100 on only what you answered: matching your gear, insulation for your climate, price against your budget, and your priorities. A missing field is not scored as zero. It pulls the score toward 50 and lowers "data on file". Reviews and sellers' R-values are not part of the score yet. The weights are a first draft.</p></details>
+<p class="note">Prices were checked on November 25, 2026 and change often. Confirm at the source. Shipping and tax are not included.</p>
+<button class="btn alt" data-quiz>Change my answers</button><button class="btn" data-go="survey">Were these useful? Tell us</button></section>
+
+<section id="survey"><h2>Help us improve the results</h2><p>About two minutes. Email is optional. <strong>Preview only: nothing is saved or sent yet.</strong></p>
+<form id="s">
+<div class="card"><label>1. What state do you keep, or plan to keep, bees in?</label><select id="sstate"></select></div>
+<div class="card"><label>2. How many hives do you have now?</label><select><option>0</option><option>1-2</option><option>3-5</option><option>6-10</option><option>11+</option></select></div>
+<div class="card"><label>3. What hive types or brands do you use?</label><input type="text" placeholder="e.g. 10-frame pine, HiveIQ"></div>
+<div class="card"><label>4. How many hives do you plan to add in the next 12 months?</label><select><option>None</option><option>1-2</option><option>3-5</option><option>6+</option><option>Not sure</option></select></div>
+<div class="card checks"><label style="font-weight:600;display:block">5. Pick your top three when buying a hive</label><span id="top3"></span></div>
+<div class="card"><label>6. What's your biggest problem with your current hives?</label><textarea rows="3"></textarea></div>
+<div class="card"><label>7. What's your budget per complete hive?</label><select><option>Under $150</option><option>$150-249</option><option>$250-399</option><option>$400-699</option><option>$700+</option></select></div>
+<div class="card"><label>Email (optional, only if you want to test the site)</label><input type="email"></div>
+<button class="btn" type="submit">Send answers</button><p id="thanks" role="status"></p></form></section>
+</main>
+<dialog id="wiz" aria-labelledby="wt"></dialog>
+<footer>HiveFit is a working name. Independent hobby project. Information may be incomplete or out of date. Confirm details with the seller.<br>Winter zones: PRISM Group, Oregon State University, <a href="https://prism.oregonstate.edu">prism.oregonstate.edu</a>, accessed 25 Nov 2026. Summer: NOAA 1991-2020 climate normals. Places: <a href="https://www.geonames.org">GeoNames</a> (CC BY 4.0).</footer>
+<script>
+const KITS=[{"maker": "Mann Lake", "model": "10 Frame Insulated Wax-Dipped Complete Hive Kit", "retailer": "Mann Lake", "material": "pine + reflective insulation + PE foam", "rv": "Not listed (see link)", "origin": "USA (maker claim)", "url": "https://www.mannlakeltd.com/insulated-hive-kits/10-frame-insulated-wax-dipped-complete-hive-kit/", "reg": 249.99, "sale": null, "end": null, "saleNote": null, "tiers": null, "boxes": 1, "frames": "yes", "assembled": true, "insulated": true, "ten": true, "verified": true, "soldout": false, "missing": 3}, {"maker": "Mann Lake", "model": "10 Frame 9 5/8in Unassembled Complete Hive Kit With Foundation", "retailer": "Mann Lake", "material": "wood", "rv": "Not checked (see link)", "origin": "USA (badge)", "url": "https://www.mannlakeltd.com/sale/", "reg": 149.99, "sale": 127.49, "end": null, "saleNote": null, "tiers": null, "boxes": 0, "frames": "unknown", "assembled": false, "insulated": false, "ten": true, "verified": false, "soldout": false, "missing": 7}, {"maker": "Mann Lake", "model": "Premium Wax Dipped Complete 10 Frame Hive Kit", "retailer": "Mann Lake", "material": "wax-dipped wood", "rv": "Not checked (see link)", "origin": "USA (badge)", "url": "https://www.mannlakeltd.com/sale/", "reg": 219.99, "sale": 186.99, "end": null, "saleNote": null, "tiers": null, "boxes": 0, "frames": "unknown", "assembled": null, "insulated": false, "ten": true, "verified": false, "soldout": false, "missing": 8}, {"maker": "Betterbee", "model": "Betterbee Recommended Hive Kit", "retailer": "Betterbee", "material": "Not checked (see link)", "rv": "Not checked (see link)", "origin": "Not checked (see link)", "url": "https://www.betterbee.com/limited-time-sales/sales.asp", "reg": 275.59, "sale": null, "end": null, "saleNote": null, "tiers": null, "boxes": 0, "frames": "unknown", "assembled": null, "insulated": null, "ten": null, "verified": true, "soldout": false, "missing": 10}, {"maker": "Lyson", "model": "Polystyrene Hive, unassembled (LYHEW1103UK)", "retailer": "Betterbee", "material": "polystyrene", "rv": "Not checked (see link)", "origin": "Poland (per PerfectBee, for Lyson line)", "url": "https://www.betterbee.com/bee-hive-kits/lyson-10-frame-hive-kits.asp", "reg": 152, "sale": null, "end": null, "saleNote": null, "tiers": null, "boxes": 2, "frames": "no", "assembled": false, "insulated": true, "ten": true, "verified": true, "soldout": false, "missing": 5}, {"maker": "Apimaye", "model": "Ergo Single Brood Box", "retailer": "Apimaye USA", "material": "insulated plastic", "rv": "6.93 (maker says independent lab test)", "origin": "Not listed (see link)", "url": "https://apimaye-usa.com/collections/apimaye-ergo-hive-sets", "reg": 265, "sale": null, "end": null, "saleNote": null, "tiers": null, "boxes": 1, "frames": "no", "assembled": null, "insulated": true, "ten": true, "verified": true, "soldout": false, "missing": 3}, {"maker": "Apimaye", "model": "Ergo Hybrid", "retailer": "Apimaye USA", "material": "insulated plastic", "rv": "6.93 (maker says independent lab test)", "origin": "Not listed (see link)", "url": "https://apimaye-usa.com/collections/apimaye-ergo-hive-sets", "reg": 385, "sale": null, "end": null, "saleNote": null, "tiers": null, "boxes": 2, "frames": "no", "assembled": null, "insulated": true, "ten": true, "verified": true, "soldout": false, "missing": 3}, {"maker": "HiveIQ", "model": "Double Deep + Medium Kit", "retailer": "Foxhound Bee Co", "material": "EPS", "rv": "7.9 (seller published; test basis unknown)", "origin": "Not listed (see link)", "url": "https://www.foxhoundbeecompany.com/products/hiveiq-double-deep-medium-kit", "reg": 307.99, "sale": 246.39, "end": null, "saleNote": "with code BlackFriday2026, if it applies", "tiers": null, "boxes": 3, "frames": "no", "assembled": false, "insulated": true, "ten": false, "verified": true, "soldout": false, "missing": 4}, {"maker": "Foxhound", "model": "10-Frame Deep and Medium Kit", "retailer": "Foxhound Bee Co", "material": "cypress", "rv": "Not checked (see link)", "origin": "USA (seller claim)", "url": "https://www.foxhoundbeecompany.com/collections/hive-kits", "reg": 197.49, "sale": 157.99, "end": null, "saleNote": "with 20% code, if it applies", "tiers": null, "boxes": 2, "frames": "yes", "assembled": false, "insulated": false, "ten": true, "verified": true, "soldout": false, "missing": 5}, {"maker": "Foxhound", "model": "10-Frame Double Deep Kit", "retailer": "Foxhound Bee Co", "material": "cypress", "rv": "Not checked (see link)", "origin": "USA (seller claim)", "url": "https://www.foxhoundbeecompany.com/collections/hive-kits", "reg": 204.49, "sale": 163.59, "end": null, "saleNote": "with 20% code, if it applies", "tiers": null, "boxes": 2, "frames": "yes", "assembled": false, "insulated": false, "ten": true, "verified": true, "soldout": false, "missing": 5}, {"maker": "Hoover Hives", "model": "The Beginner (10 Frame)", "retailer": "Hoover Hives", "material": "wax-dipped fir", "rv": "Not checked (see link)", "origin": "conflicting: eBay listings show both USA and China", "url": "https://hooverhives.com/product-category/beehive-kits/", "reg": 159, "sale": null, "end": null, "saleNote": null, "tiers": null, "boxes": 2, "frames": "yes", "assembled": false, "insulated": false, "ten": true, "verified": true, "soldout": false, "missing": 4}, {"maker": "Hoover Hives", "model": "The Gold Standard (10 Frame)", "retailer": "Hoover Hives", "material": "wax-dipped fir", "rv": "Not checked (see link)", "origin": "Not checked (see link)", "url": "https://hooverhives.com/product-category/beehive-kits/", "reg": 199, "sale": null, "end": null, "saleNote": null, "tiers": null, "boxes": 3, "frames": "yes", "assembled": false, "insulated": false, "ten": true, "verified": true, "soldout": false, "missing": 5}, {"maker": "Pierco", "model": "Basic 10 Frame Starter Kit, Assembled", "retailer": "Pierco", "material": "wood", "rv": "Not checked (see link)", "origin": "Not checked (see link)", "url": "https://www.pierco.com/collections/featured-items/hive-bodies", "reg": 129.99, "sale": null, "end": null, "saleNote": null, "tiers": null, "boxes": 0, "frames": "unknown", "assembled": true, "insulated": false, "ten": true, "verified": false, "soldout": false, "missing": 9}, {"maker": "Blue Sky Bee Supply", "model": "Polystyrene 10 Frame Deep Hive Kit", "retailer": "Blue Sky Bee Supply", "material": "polystyrene", "rv": "8 (seller published; test basis unknown)", "origin": "Not checked (see link)", "url": "https://www.blueskybeesupply.com/products/polystyrene-10-frame-hive-kit", "reg": 87.95, "sale": null, "end": null, "saleNote": null, "tiers": null, "boxes": 1, "frames": "no", "assembled": false, "insulated": true, "ten": true, "verified": false, "soldout": true, "missing": 5}, {"maker": "Primal Bee", "model": "Single Super Kit", "retailer": "Primal Bee", "material": "EPS", "rv": "50+ (maker average, whole hive)", "origin": "Not listed (see link)", "url": "https://primalbee.com/", "reg": 649, "sale": null, "end": null, "saleNote": null, "tiers": [599, 499], "boxes": 2, "frames": "partial", "assembled": false, "insulated": true, "ten": false, "verified": true, "soldout": false, "missing": 3}, {"maker": "Primal Bee", "model": "Starter Kit", "retailer": "Primal Bee", "material": "EPS", "rv": "50+ (maker average, whole hive)", "origin": "Not listed (see link)", "url": "https://primalbee.com/", "reg": 799, "sale": 699, "end": null, "saleNote": "sale price", "tiers": [599, 549], "boxes": 3, "frames": "partial", "assembled": false, "insulated": true, "ten": false, "verified": true, "soldout": false, "missing": 3}, {"maker": "Primal Bee", "model": "Complete Kit", "retailer": "Primal Bee", "material": "EPS", "rv": "50+ (maker average, whole hive)", "origin": "Not listed (see link)", "url": "https://primalbee.com/", "reg": 949, "sale": null, "end": null, "saleNote": null, "tiers": [833, 745], "boxes": 3, "frames": "yes", "assembled": false, "insulated": true, "ten": false, "verified": true, "soldout": false, "missing": 3}, {"maker": "Premier Bee Products", "model": "Pura 10-Frame Hive Kit (single deep)", "retailer": "Premier Bee Products", "material": "Not checked (see link)", "rv": "Not checked (see link)", "origin": "USA, Sioux Falls SD (maker claim for hive bodies and frames)", "url": "https://www.premierbeeproducts.com/shop-all", "reg": 139.95, "sale": 118.96, "end": "2026-11-30", "saleNote": "Black Friday sale", "tiers": null, "boxes": 1, "frames": "unknown", "assembled": true, "insulated": null, "ten": true, "verified": true, "soldout": false, "missing": 5}, {"maker": "Premier Bee Products", "model": "Propola 10-Frame Hive Kit (single deep)", "retailer": "Premier Bee Products", "material": "Not checked (see link)", "rv": "Not checked (see link)", "origin": "USA, Sioux Falls SD (maker claim for hive bodies and frames)", "url": "https://www.premierbeeproducts.com/shop-all", "reg": 144.95, "sale": 123.21, "end": "2026-11-30", "saleNote": "Black Friday sale", "tiers": null, "boxes": 1, "frames": "unknown", "assembled": true, "insulated": null, "ten": true, "verified": true, "soldout": false, "missing": 5}, {"maker": "Premier Bee Products", "model": "Pura 10-Frame Hive Kit (double deep + double medium)", "retailer": "Premier Bee Products", "material": "Not checked (see link)", "rv": "Not checked (see link)", "origin": "USA, Sioux Falls SD (maker claim for hive bodies and frames)", "url": "https://www.premierbeeproducts.com/shop-all", "reg": 334.95, "sale": 284.71, "end": "2026-11-30", "saleNote": "Black Friday sale", "tiers": null, "boxes": 4, "frames": "unknown", "assembled": true, "insulated": null, "ten": true, "verified": true, "soldout": false, "missing": 5}, {"maker": "Premier Bee Products", "model": "Propola 10-Frame Hive Kit (double deep + double medium)", "retailer": "Premier Bee Products", "material": "Not checked (see link)", "rv": "Not checked (see link)", "origin": "USA, Sioux Falls SD (maker claim for hive bodies and frames)", "url": "https://www.premierbeeproducts.com/shop-all", "reg": 344.95, "sale": 293.21, "end": "2026-11-30", "saleNote": "Black Friday sale", "tiers": null, "boxes": 4, "frames": "unknown", "assembled": true, "insulated": null, "ten": true, "verified": true, "soldout": false, "missing": 5}, {"maker": "Premier Bee Products", "model": "Wax-Dipped 10-Frame Hive Kit (single deep)", "retailer": "Premier Bee Products", "material": "wax-dipped wood", "rv": "Not checked (see link)", "origin": "USA, Sioux Falls SD (maker claim for hive bodies and frames)", "url": "https://www.premierbeeproducts.com/shop-all", "reg": 159.95, "sale": 135.96, "end": "2026-11-30", "saleNote": "Black Friday sale", "tiers": null, "boxes": 1, "frames": "unknown", "assembled": null, "insulated": false, "ten": true, "verified": true, "soldout": false, "missing": 5}, {"maker": "Premier Bee Products", "model": "Wax-Dipped Propola 10-Frame Hive Kit (single deep)", "retailer": "Premier Bee Products", "material": "wax-dipped wood", "rv": "Not checked (see link)", "origin": "USA, Sioux Falls SD (maker claim for hive bodies and frames)", "url": "https://www.premierbeeproducts.com/shop-all", "reg": 164.95, "sale": 140.21, "end": "2026-11-30", "saleNote": "Black Friday sale", "tiers": null, "boxes": 1, "frames": "unknown", "assembled": null, "insulated": false, "ten": true, "verified": true, "soldout": false, "missing": 5}, {"maker": "Premier Bee Products", "model": "Wax-Dipped 10-Frame Hive Kit (double deep + double medium)", "retailer": "Premier Bee Products", "material": "wax-dipped wood", "rv": "Not checked (see link)", "origin": "USA, Sioux Falls SD (maker claim for hive bodies and frames)", "url": "https://www.premierbeeproducts.com/shop-all", "reg": 369.95, "sale": 314.46, "end": "2026-11-30", "saleNote": "Black Friday sale", "tiers": null, "boxes": 4, "frames": "unknown", "assembled": null, "insulated": false, "ten": true, "verified": true, "soldout": false, "missing": 5}, {"maker": "Premier Bee Products", "model": "Wax-Dipped Propola 10-Frame Hive Kit (double deep + double medium)", "retailer": "Premier Bee Products", "material": "wax-dipped wood", "rv": "Not checked (see link)", "origin": "USA, Sioux Falls SD (maker claim for hive bodies and frames)", "url": "https://www.premierbeeproducts.com/shop-all", "reg": 379.95, "sale": 322.96, "end": "2026-11-30", "saleNote": "Black Friday sale", "tiers": null, "boxes": 4, "frames": "unknown", "assembled": null, "insulated": false, "ten": true, "verified": true, "soldout": false, "missing": 5}];
+const $=s=>document.querySelector(s);
+const STATES="AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(" ");
+$("#sstate").innerHTML=STATES.map(s=>`<option>${s}</option>`).join("");
+$("#top3").innerHTML=["Price","Insulation","Weight","Easy assembly","Durability","Fits current gear","Made in USA","Reviews","Shipping"].map(t=>`<label><input type="checkbox"> ${t}</label>`).join("");
+$("#top3").addEventListener("change",e=>{if($("#top3").querySelectorAll(":checked").length>3)e.target.checked=false});
+function go(id){document.querySelectorAll("section").forEach(s=>s.classList.toggle("on",s.id==id));scrollTo(0,0)}
+document.querySelectorAll("[data-go]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();go(a.dataset.go)}));
+$("#s").addEventListener("submit",e=>{e.preventDefault();$("#thanks").textContent="Thanks. This is a preview, so nothing was saved."});
+
+const fresh=()=>({zip:"",place:"",winter:null,summer:null,detail:"",gear:null,qty:null,boxes:null,budget:null,pri:[]});
+let A=fresh(), step=0, busy=false, shown=5, ranked=[];
+const WIN=[["cold","Cold winters"],["moderate","Moderate winters"],["mild","Mild winters"]], SUM=[["hot","Hot summers"],["warm","Warm summers"],["cool","Mild summers"]];
+const STEPS=[
+ {t:"Where will the hive be?"},
+ {t:"What do you run today?",k:"gear",o:[["none","No hives yet"],["wood10","10-frame Langstroth"],["hiveiq","HiveIQ"],["wood8","8-frame"],["other","Something else"]]},
+ {t:"How many hives are you buying?",k:"qty",o:[[1,"1"],[2,"2"],[3,"3 or 4"],[5,"5 or more"]],k2:"boxes",t2:"Boxes per kit",o2:[[1,"1"],[2,"2"],[3,"3 or more"]]},
+ {t:"Most you'd pay per kit?",k:"budget",o:[[175,"Up to $175"],[275,"Up to $275"],[400,"Up to $400"],[700,"Up to $700"],[99999,"No limit"]]},
+ {t:"What matters most? Pick any.",k:"pri",o:[["price","Low price"],["frames","Frames included"],["assembled","Already assembled"],["insul","Insulation"]]}];
+const TERMS={
+ winter:["Winter types","Based on the coldest night in a typical year (USDA hardiness zone).<br><b>Cold:</b> colder than -10°F (zone 5 and lower)<br><b>Moderate:</b> -10°F to 10°F (zones 6 and 7)<br><b>Mild:</b> 10°F or warmer (zone 8 and higher)"],
+ summer:["Summer types","Based on days per year reaching 90°F or more.<br><b>Hot:</b> 60 days or more<br><b>Warm:</b> 15 to 59 days<br><b>Mild:</b> fewer than 15 days"]};
+const info=k=>`<b>${TERMS[k][0]}</b><button type="button" class="i" aria-expanded="false" aria-label="What do ${TERMS[k][0].toLowerCase()} mean?">i</button><div class="tip">${TERMS[k][1]}<br><span class="note">These cutoffs are HiveFit's own, not an official standard.</span></div>`;
+const opt=(k,v,label)=>`<button type="button" class="opt" data-k="${k}" data-v="${v}" aria-pressed="${k=="pri"?A.pri.includes(v):String(A[k])==String(v)}">${label}</button>`;
+function draw(){
+ const s=STEPS[step], last=step==STEPS.length-1; let body;
+ if(step==0) body=`<label for="zip">ZIP code of the hive location</label><div class="row zr"><input type="text" id="zip" inputmode="numeric" autocomplete="postal-code" enterkeyhint="search" maxlength="5" value="${A.zip}"><button type="button" class="btn" id="look">Look up</button></div>
+  <p id="cl" role="status">${A.detail}</p><p><b>Does this match your yard?</b> Change it if not (elevation and wind can differ within a ZIP).</p>
+  <div>${info("winter")}</div><div class="row">${WIN.map(o=>opt("winter",...o)).join("")}</div><div style="margin-top:12px">${info("summer")}</div><div class="row">${SUM.map(o=>opt("summer",...o)).join("")}</div>
+  <p class="note">Looked up in our own table. Your ZIP is not sent to another service.</p>`;
+ else body=`<div class="opts">${s.o.map(o=>opt(s.k,...o)).join("")}</div>`+(s.k2?`<b>${s.t2}</b><div class="row">${s.o2.map(o=>opt(s.k2,...o)).join("")}</div>`:"");
+ $("#wiz").innerHTML=`<div class="wh"><div class="bar"><i style="width:${(step+1)/STEPS.length*100}%"></i></div><div class="note">Step ${step+1} of ${STEPS.length}</div><h2 id="wt" tabindex="-1" autofocus>${s.t}</h2></div><div class="wb">${body}</div>
+ <div class="wf"><div class="nav"><button type="button" class="link" id="back" ${step?"":"style='visibility:hidden'"}>Back</button><span><button type="button" class="link" id="skip">Skip this question</button><button type="button" class="btn" id="next">${last?"Show results":"Next"}</button></span></div>
+ <div style="text-align:center"><button type="button" class="link" id="end">Skip to results</button></div></div>`;
+}
+const dl=$("#wiz");
+function openQuiz(){step=0;draw();dl.showModal()}
+document.querySelectorAll("[data-quiz]").forEach(b=>b.addEventListener("click",e=>{e.preventDefault();openQuiz()}));
+function finish(){dl.close();shown=5;results();go("results")}
+function forward(){if(step==STEPS.length-1)finish();else{step++;draw()}}
+document.addEventListener("click",e=>{const i=e.target.closest(".i");if(i)i.setAttribute("aria-expanded",i.getAttribute("aria-expanded")!="true")});
+dl.addEventListener("click",e=>{
+ const b=e.target.closest("button"); if(!b||b.classList.contains("i"))return;
+ if(b.dataset.k){const k=b.dataset.k; let v=b.dataset.v; if(["qty","boxes","budget"].includes(k))v=+v;
+  if(k=="pri")A.pri=A.pri.includes(v)?A.pri.filter(x=>x!=v):[...A.pri,v]; else A[k]=A[k]===v?null:v;
+  b.parentElement.querySelectorAll(".opt").forEach(o=>o.setAttribute("aria-pressed",k=="pri"?A.pri.includes(o.dataset.v):String(A[k])==o.dataset.v));return}
+ if(b.id=="look")lookup();
+ if(b.id=="next")forward();
+ if(b.id=="back"){step--;draw()}
+ if(b.id=="end")finish();
+ if(b.id=="skip"){const s=STEPS[step]; if(step==0)Object.assign(A,{zip:"",place:"",winter:null,summer:null,detail:""}); else {A[s.k]=s.k=="pri"?[]:null; if(s.k2)A[s.k2]=null} forward()}
+});
+dl.addEventListener("keydown",e=>{if(e.key=="Enter"&&e.target.id=="zip"){e.preventDefault();lookup()}});
+const loadShard=p=>new Promise((ok,no)=>{if(window.ZIPDATA&&ZIPDATA[p])return ok();const s=document.createElement("script");s.src=`data/zip/${p}.js`;s.onload=ok;s.onerror=()=>{s.remove();no()};document.head.appendChild(s)});
+async function lookup(){
+ const z=$("#zip").value.trim(), out=()=>{const el=$("#cl");if(el)el.innerHTML=A.detail};
+ if(!/^\d{5}$/.test(z)){A.detail="Enter a 5-digit ZIP.";return out()}
+ Object.assign(A,{zip:z,place:"",winter:null,summer:null,detail:"Looking up…"});out();
+ let r; try{await loadShard(z.slice(0,2));r=ZIPDATA[z.slice(0,2)][z]}catch(e){}
+ if(A.zip!=z)return;
+ if(!r){A.detail="We don't have that ZIP. Pick your climate below.";if(dl.open&&step==0)draw();return}
+ const [city,st,zone,range,winter,days,summer,check]=r;
+ const w=zone?`Coldest nights are typically ${range}°F.`:"Winter data unavailable, so pick it below.";
+ const h=days===""?"Summer data unavailable, so pick it below.":`About ${days} days a year reach 90°F (1991 to 2020 average).${check?" Nearby stations are far or disagree, so check this one.":""}`;
+ Object.assign(A,{place:`${city}, ${st}`,winter:winter||null,summer:(summer=="mild"?"cool":summer)||null,detail:`<b>Climate for ${esc(city)}, ${esc(st)}</b><br>${w} ${h}${zone?` <span class="note">(USDA zone ${zone})</span>`:""}`});
+ if(dl.open&&step==0)draw();
+}
+
+const esc=s=>String(s).replace(/[&<>"']/g,c=>`&#${c.charCodeAt(0)};`);
+const money=n=>"$"+n.toFixed(2);
+function priceNow(k,qty){
+ const today=new Date().toLocaleDateString("en-CA"), open=!k.end||today<=k.end;
+ let p=k.sale&&open?k.sale:k.reg, label=k.sale&&open?(k.saleNote||"sale price"):"regular price";
+ if(k.tiers&&open){if(qty>=5){p=k.tiers[1];label="each when buying 5+"}else if(qty>=3){p=k.tiers[0];label="each when buying 3+"}}
+ return {p,label,was:p<k.reg?k.reg:null};
+}
+function rate(k,pr){
+ const c=[]; // name, weight, value 0..1 or null=unknown, reason
+ const primal=k.maker=="Primal Bee";
+ if(A.gear=="hiveiq")c.push(["Your gear",30,k.maker=="HiveIQ"?1:primal?.15:k.ten==null?null:.4,k.maker=="HiveIQ"?"Same system as yours":primal?"Own brood frame size":"Boxes and lids may not match HiveIQ"]);
+ if(A.gear=="wood10")c.push(["Your gear",30,primal?.15:k.maker=="HiveIQ"?.4:k.ten?1:null,primal?"Own brood frame size":k.maker=="HiveIQ"?"Check what interchanges":k.ten?"10-frame":"Frame count not confirmed"]);
+ if(A.gear=="wood8")c.push(["Your gear",30,.2,"Not an 8-frame kit"]);
+ const hard=A.winter=="cold"||A.summer=="hot", wants=A.pri.includes("insul");
+ if(A.winter||A.summer||wants){const w=(hard?25:A.winter=="moderate"?12:6)+(wants?20:0);
+  c.push(["Climate",w,k.insulated==null?null:k.insulated?1:.25,k.insulated==null?"Material not checked":k.insulated?(hard?"Insulated, suits your extremes":"Insulated"):"No added insulation"])}
+ if(A.budget||A.pri.includes("price")){const cap=A.budget&&A.budget<99999?A.budget:950;
+  c.push(["Price",A.pri.includes("price")?35:15,k.verified?Math.max(0,Math.min(1,1.2-pr.p/cap)):null,k.verified?money(pr.p):"Price unconfirmed"])}
+ if(A.pri.includes("frames"))c.push(["Frames",20,{yes:1,no:0,partial:.5}[k.frames]??null,{yes:"Included",no:"Cost extra",partial:"Some cost extra"}[k.frames]||"Not checked"]);
+ if(A.pri.includes("assembled"))c.push(["Assembly",15,k.assembled==null?null:+k.assembled,k.assembled==null?"Not confirmed":k.assembled?"Arrives assembled":"You build it"]);
+ const all=c.reduce((s,x)=>s+x[1],0), known=c.filter(x=>x[2]!=null), kw=known.reduce((s,x)=>s+x[1],0);
+ if(!all)return {c,score:null,cover:null};
+ const cover=kw/all, raw=kw?known.reduce((s,x)=>s+x[1]*x[2],0)/kw*100:50;
+ return {c,cover,score:Math.round(50+(raw-50)*cover)};
+}
+const verdict=r=>r.score>=75&&r.cover>=.75?["Great fit","#4F6F52"]:r.score>=60?["Good fit","#B77900"]:r.score>=45?["Possible","#9A8F78"]:["Weak fit","#A4472B"];
+const onFile=k=>k.missing<=3&&k.verified?"Most":k.missing<=5&&k.verified?"Some":"Little";
+const art=k=>`<svg viewBox="0 0 90 100" width="60" aria-hidden="true"><path d="M8 20 45 6l37 14z" fill="#23201A"/>${Array.from({length:Math.min(k.boxes||1,4)},(_,n)=>`<rect x="14" y="${22+n*18}" width="62" height="18" fill="${k.insulated?'#FCEBB8':'#D9B98A'}" stroke="#23201A" stroke-width="2"/>`).join("")}</svg>`;
+function results(){
+ ranked=KITS.map(k=>{const pr=priceNow(k,A.qty||1);return {k,pr,...rate(k,pr)}})
+  .filter(r=>!r.k.soldout&&(!A.budget||r.pr.p<=A.budget)&&(!A.boxes||(A.boxes==3?r.k.boxes>=3:r.k.boxes==A.boxes)))
+  .sort((x,y)=>(y.score??0)-(x.score??0)||y.cover-x.cover||x.pr.p-y.pr.p);
+ render();
+}
+function render(){
+ const rated=ranked.length&&ranked[0].score!=null, n=ranked.length;
+ $("#summary").textContent=!n?"No kits match. Raise the budget or skip the box question.":rated?`${n} kits, best fit for your answers first.`:`${n} kits, lowest price first. Answer at least one question about your gear, climate, budget or priorities to get fit scores.`;
+ const names={cold:"Cold winters",moderate:"Moderate winters",mild:"Mild winters",hot:"Hot summers",warm:"Warm summers",cool:"Mild summers"};
+ $("#rh").textContent=A.place?`Hive kits for ${A.place}`:"Your matches";
+ $("#chips").innerHTML=[A.zip&&"ZIP "+A.zip,names[A.winter],names[A.summer],...[1,2,3,4].map(i=>{const s=STEPS[i];return [s.k,s.k2].filter(Boolean).map(k=>{const o=k==s.k?s.o:s.o2;if(k=="pri")return A.pri.map(v=>o.find(x=>x[0]==v)[1]).join(", ");const m=o.find(x=>x[0]===A[k]);return m&&(k=="qty"?"Buying "+m[1]:k=="boxes"?"Boxes: "+m[1]:m[1])}).filter(Boolean).join(" · ")})].filter(Boolean).map(x=>`<span class="tag">${x}</span>`).join("");
+ const top=ranked.slice(0,3);
+ $("#compare").innerHTML=rated&&n>1?`<h3>Side by side</h3><div class="tbl"><table><tr><th></th>${top.map(r=>`<th>${r.k.maker}<br>${r.k.model}</th>`).join("")}</tr>
+  <tr><th>Fit score</th>${top.map(r=>`<td><b>${r.score}</b> ${verdict(r)[0]}</td>`).join("")}</tr><tr><th>Price per kit</th>${top.map(r=>`<td>${money(r.pr.p)}</td>`).join("")}</tr>
+  ${top[0].c.map((x,i)=>`<tr><th>${x[0]}</th>${top.map(r=>`<td>${r.c[i][3]}</td>`).join("")}</tr>`).join("")}<tr><th>Data on file</th>${top.map(r=>`<td>${onFile(r.k)}</td>`).join("")}</tr></table></div><br>`:"";
+ $("#list").innerHTML=ranked.slice(0,shown).map(x=>{const rank=rated?ranked.findIndex(y=>y.score==x.score)+1:null, tied=rated&&ranked.filter(y=>y.score==x.score).length>1, [v,col]=rated?verdict(x):["",""];
+  return `<article class="card res${rank==1?" top":""}"><div style="text-align:center">${rated?`<div class="ring" style="--v:${x.score};--c:${col}"><b>${x.score}</b></div><b style="color:${col}">${v}</b>`:art(x.k)}</div>
+  <div><div class="note">${rated?`<b>${rank==1?(tied?"Tied for top pick":"Top pick for you"):(tied?"Tied #":"#")+rank}</b> · `:""}${x.k.maker} · sold by ${x.k.retailer}</div><h3 style="margin:4px 0 8px">${x.k.model}</h3>
+  ${x.c.map(c=>`<div class="crit"><span>${c[0]}</span><div class="bar${c[2]==null?" unk":""}">${c[2]==null?"":`<i style="width:${Math.max(4,c[2]*100)}%"></i>`}</div><span>${c[3]}</span></div>`).join("")}
+  <div class="note" style="margin-top:8px">Frames: <b>${({yes:'included',no:'cost extra',partial:'some cost extra'})[x.k.frames]||'not checked'}</b> · Data on file: <b>${onFile(x.k)}</b><br>R-value: ${x.k.rv}<br>Material: ${x.k.material} · Made in: ${x.k.origin}<br><a href="${x.k.url}" target="_blank" rel="noopener">See the source ↗</a></div></div>
+  <div class="price">${money(x.pr.p)}<small>${x.pr.label}${x.pr.was?"<br><s>"+money(x.pr.was)+"</s>":""}${x.k.end&&x.pr.was?"<br>ends "+x.k.end.slice(5).replace("-","/"):""}</small></div></article>`}).join("");
+ $("#more").style.display=n>shown?"":"none";
+}
+$("#keyc").innerHTML=["winter","summer"].map(k=>`<p><b>${TERMS[k][0]}</b><br>${TERMS[k][1]}</p>`).join("");
+$("#more").addEventListener("click",()=>{shown+=10;render()});
+</script></body></html>

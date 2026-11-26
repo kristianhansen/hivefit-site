@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 80" role="img" aria-label="HiveFit">
+<path d="M40 4 71 22v36L40 76 9 58V22z" fill="#F2B21B"/>
+<g fill="#23201A"><path d="M20 28l20-9 20 9z"/><rect x="23" y="31" width="34" height="9" rx="1.5"/><rect x="23" y="43" width="34" height="9" rx="1.5"/><rect x="23" y="55" width="34" height="7" rx="1.5"/></g>
+<rect x="33" y="57" width="14" height="3" fill="#F2B21B"/>
+<text x="88" y="54" font-family="Georgia, 'Times New Roman', serif" font-size="44" font-weight="700" fill="#23201A">Hive<tspan fill="#B77900">Fit</tspan></text>
+</svg>
